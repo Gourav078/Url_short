@@ -1,14 +1,19 @@
-const { Schema, model, models } = require("mongoose");
-const shortid = require("shortid");
+import { Schema, model, models } from "mongoose";
 
 const UrlSchema = new Schema({
-  code: {
+  longUrl: {
     type: String,
-    unique: true,
-    default: shortid.generate,
+    required: true,
   },
-  url: { type: String, require: true },
-  clicked: { type: Number, default: 0 },
+  shortUrl: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  clicks: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Urls = models.Urls || model("Urls", UrlSchema);
