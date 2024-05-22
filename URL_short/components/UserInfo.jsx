@@ -1,13 +1,12 @@
-import Head from "next/head";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import styles from "../styles/Home.module.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Head from "next/head";
+import Link from "next/link";
+import React, { useState } from "react";
 
-export default function Home({ urlList }) {
-  const [data, setData] = useState(urlList);
+export default function Home({ urlList = [] }) {
+  const [data, setData] = useState(urlList || []);
   const [newUrl, setNewUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   //on submit form call post API
   const handleOnSubmit = async (e) => {
@@ -72,9 +71,12 @@ export default function Home({ urlList }) {
                         }
                       </td>
                       <td>
-                        <a target="_blank" href={`/api/${urlObject.code}`}>
+                        <Link
+                          // target="_blank"
+                          href={`/api/${urlObject.code}`}
+                        >
                           {urlObject.code}
-                        </a>
+                        </Link>
                       </td>
                       <td>{urlObject.clicked}</td>
                     </tr>
@@ -94,12 +96,24 @@ export default function Home({ urlList }) {
 
 export async function getServerSideProps(context) {
   //call api on load
-  const res = await fetch("http://localhost:3000/api/url");
-  const urlList = await res.json();
-
-  return {
-    props: {
-      urlList,
-    },
-  };
+  try {
+    const res = await fetch("http://localhost:3000/api/url");
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const urlList = await res.json();
+    return {
+      props: {
+        urlList,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    // Handle error gracefully, e.g., show a message to the user
+    return {
+      props: {
+        error: "Failed to fetch data",
+      },
+    };
+  }
 }
